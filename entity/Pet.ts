@@ -4,6 +4,8 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Length, IsDate, IsInt } from "class-validator";
 
+// Define Pet Model
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid")

@@ -7,6 +7,8 @@ import * as bcrypt from "bcrypt";
 
 import { config } from "../config";
 
+// Define User Model
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid")
