@@ -4,7 +4,7 @@
 import * as crypto from "crypto";
 
 import { getManager, Repository, Not, Equal } from "typeorm";
-import { validate, ValidationError }  from "class-validator";
+import { validate, ValidationError, IsEmail, IsNotEmpty }  from "class-validator";
 import { Context } from "koa";
 import * as bcrypt  from "bcrypt";
 
@@ -16,66 +16,66 @@ export default class AuthController {
 
   public static async loginUser(ctx: Context) {
 
-    const body = ctx.body;
+    try {
+      const body: any = ctx.request.body;
 
-    class AuthUser {
-      @Length(10, 100)
-      @IsEmail()
-      email: string;
+      class AuthUser {
+        @IsEmail()
+        @IsNotEmpty()
+        email!: string;
 
-      @Length(10, 100)
-      password: string;
+        @IsNotEmpty()
+        password!: string;
+      }
+
+      // Get User/AuthToken Repo
+      const UserRepo: Repository<User> = getManager().getRepository(User);
+      const AuthTokenRepo: Repository<AuthToken> = getManager().getRepository(AuthToken);
+
+      let authUser = new AuthUser();
+      authUser.email = body.email;
+      authUser.password = body.password;
+
+      // validate user auth info
+      let errors: ValidationError[] = await validate(authUser);
+
+      // If Validation Errors Respond Immediately
+      if(errors.length) {
+        throw new Error(JSON.stringify(errors))
+      }
+
+      // Verify Email address
+      let user: any = await UserRepo.findOne({ email: body.email });
+      if(!user) {
+        throw new Error("User With Those Credentials Does Not Exist")
+      }
+
+      // Verijfy Password
+      let isPasswordOk = await bcrypt.compare(body.password, user.password);
+      if(!isPasswordOk) {
+        throw new Error("User With Those Credentials Does Not Exist")
+      }
+
+      // Upsert User Auth Token
+      let userToken = await AuthTokenRepo.findOne({ user_id: user.id });
+      let apiKey = crypto.randomBytes(11).toString("hex");
+      if(userToken) {
+        await AuthTokenRepo.update(user.id, { token: apiKey });
+      } else {
+        await AuthTokenRepo.insert({
+          user_id: user.id,
+          token: apiKey
+        });
+      }
+
+      ctx.body = {
+        token: apiKey,
+        user: user
+      };
+
+    } catch(ex) {
+      ctx.throw(ex)
     }
-
-    // Get User/AuthToken Repo
-    const UserRepo: Repository<User> = getManager().getRepository(User);
-    const AuthTokenRepo: Repository<AuthToken> = getManager().getRepository(AuthToken);
-
-    let authUser = new AuthUser();
-    authUser.email = body.email;
-    authUser.password = body.password;
-
-    // validate user auth info
-    let errors: ValidationError[] = await validate(authUser);
-
-    // If Validation Errors Respond Immediately
-    if(errors.length) {
-      ctx.status = 400;
-      ctx.body = errors;
-    }
-
-    // Verify Email address
-    let user = await UserRepo.findOne({ email: body.email });
-    if(!user) {
-      ctx.status = 400;
-      ctx.body = { message: "User With Those Credentials Does Not Exist";
-    }
-
-    // Verijfy Password
-    let isPasswordOk = await bcrypt.compare(body.password, user.password);
-    if(!isPasswordOk) {
-      ctx.status = 400;
-      ctx.body = { message: "User With Those Credentials Does Not Exist";
-    }
-
-    // Upsert User Auth Token
-    let userToken = await AuthTokenRepo.findOne({ user_id: user.id });
-    let apiKey = crypto.randomBytes(11).toString("hex");
-    if(userToken) {
-      await AuthTokenRepo.update(user.id, { token: apiKey });
-    } else {
-      await AuthTokenRepo.insert({
-        user_id; user.id,
-        token: apiKey
-      });
-    }
-
-    ctx.status = 201;
-    ctx.body = {
-      token: apiKey,
-      user: user
-    };
-
   }
 
   public static async logoutUser(ctx: Context) {

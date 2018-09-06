@@ -1,7 +1,7 @@
 /**
  * Load Module Dependencies
  */
-import { getManager, Repository, Not, Equal }   from "typeorm";
+import { getManager, Repository  }   from "typeorm";
 import { validate, ValidationError }           from "class-validator";
 import { Context }                             from "koa";
 
@@ -12,33 +12,38 @@ export default class UserController {
 
   public static async createUser(ctx: Context) {
 
-    // Get User Repo
-    const UserRepo: Repository<User> = getManager().getRepository(User);
+    try {
+      const body: any = ctx.request.body;
 
-    // Construct User to Be Saved
-    let user = UserRepo.create(ctx.body);
+      // Get User Repo
+      const UserRepo: Repository<User> = getManager().getRepository(User);
 
-    // validate User Entity Data
-    let errors: ValidationError[] = await validate(user);
+      // Construct User to Be Saved
+      let user = UserRepo.create(body);
 
-    // If Validation Errors Response Immediately
-    if(errors.length) {
-      ctx.status = 400;
-      ctx.body = errors;
+      // validate User Entity Data
+      let errors: ValidationError[] = await validate(user);
+
+      // If Validation Errors Response Immediately
+      if(errors.length > 0) {
+        throw new Error(JSON.stringify(errors))
+      }
+
+      // Check if User Already Exists
+      let userExists = await UserRepo.findOne({ email: body.email });
+      if(userExists) {
+        throw new Error("User Exists Already")
+      }
+
+      // Finally Save User
+      user = await UserRepo.save(user);
+
+      ctx.status = 201;
+      ctx.body = user;
+
+    } catch(ex) {
+      ctx.throw(ex);
     }
-
-    // Check if User Already Exists
-    let userExists = await UserRepo.findOne({ email: body.email });
-    if(userExists) {
-      ctx.status = 400;
-      ctx.body = { message: "User Exists Already";
-    }
-
-    // Finally Save User
-    user = await UserRepo.save(user);
-
-    ctx.status = 201;
-    ctx.body = user;
 
   }
 }
