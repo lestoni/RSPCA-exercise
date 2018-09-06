@@ -9,16 +9,16 @@ import { IsEmail, Length } from "class-validator";
 @Entity()
 export class AuthToken {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id!: string;
 
   @Column({
     length: 100
   })
-  user_id: string;
+  user_id!: string;
 
   @Column({
     length: 100,
     unique: true
   })
-  token: string;
+  token!: string;
 }

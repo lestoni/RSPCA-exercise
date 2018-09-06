@@ -7,32 +7,32 @@ import { Length, IsDate, IsInt } from "class-validator";
 // Define Pet Model
 
 @Entity()
-export class User {
+export class Pet {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id!: string;
 
   @Column({
     unique: true
   })
-  RFID: string;
+  RFID!: string;
 
   @Column()
-  species: string;
+  species!: string;
 
   @Column()
-  breed: string;
+  breed!: string;
 
   @Column()
-  height_at_withers: number;
+  height_at_withers!: number;
 
   @Column()
   @IsInt()
-  weight: number;
+  weight!: number;
 
   @Column()
-  description: number;
+  description!: number;
 
   @Column()
   @IsDate()
-  date_of_arrival: Date;
+  date_of_arrival!: Date;
 }
