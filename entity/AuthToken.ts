@@ -1,8 +1,10 @@
 /**
  * Load Module Dependencies
  */
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, OneToOne, JoinColumn } from "typeorm";
 import { IsEmail, Length } from "class-validator";
+
+import { User } from "../entity/User";
 
 // Define Auth Token Model
 
@@ -12,13 +14,14 @@ export class AuthToken {
   id!: string;
 
   @Column({
-    length: 100
-  })
-  user_id!: string;
-
-  @Column({
     length: 100,
     unique: true
   })
   token!: string;
+
+  @OneToOne(type => User, {
+    eager: true
+  })
+  @JoinColumn()
+  user_id!: User;
 }

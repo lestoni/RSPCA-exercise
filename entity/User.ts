@@ -1,11 +1,24 @@
 /**
  * Load Module Dependencies
  */
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from "typeorm";
-import { IsEmail, Length, IsNotEmpty, IsString, MinLength } from "class-validator";
+import {
+  Entity, 
+  Column, 
+  PrimaryGeneratedColumn, 
+  BeforeInsert, 
+  OneToMany 
+} from "typeorm";
+import { 
+  IsEmail, 
+  Length, 
+  IsNotEmpty, 
+  IsString, 
+  MinLength 
+} from "class-validator";
 import bcrypt from "bcrypt";
 
 import { config } from "../config";
+import { Pet } from "../entity/Pet";
 
 // Define User Model
 
@@ -30,6 +43,11 @@ export class User {
   @IsEmail()
   email!: string;
 
+  // Associate Staff User With A Pet
+  @OneToMany(type => Pet, pet => pet.added_by)
+  pets!: Pet[];
+
+  // Listeners
   @BeforeInsert()
   hashPassword() {
     // hash password

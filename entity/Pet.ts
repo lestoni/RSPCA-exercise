@@ -1,8 +1,10 @@
 /**
  * Load Module Dependencies
  */
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { Length, IsDate, IsInt } from "class-validator";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Length, IsDate, IsInt, IsISO8601 } from "class-validator";
+
+import { User } from "../entity/User";
 
 // Define Pet Model
 
@@ -33,6 +35,12 @@ export class Pet {
   description!: number;
 
   @Column()
-  @IsDate()
+  @IsISO8601()
   date_of_arrival!: Date;
+
+  // Associate Staff User With A Pet
+  @ManyToOne(type => User, user => user.pets, {
+    eager: true
+  })
+  added_by!: User;
 }

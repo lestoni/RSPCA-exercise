@@ -58,7 +58,7 @@ export default class AuthController {
 
       // Upsert User Auth Token
       let userToken = await AuthTokenRepo.findOne({ user_id: user.id });
-      let apiKey = crypto.randomBytes(11).toString("hex");
+      let apiKey = crypto.randomBytes(23).toString("base64");
       if(userToken) {
         await AuthTokenRepo.update(user.id, { token: apiKey });
       } else {
@@ -80,7 +80,7 @@ export default class AuthController {
 
   public static async logoutUser(ctx: Context) {
 
-    const SessionUser = ctx.state._user;
+    const SessionUser = ctx.state.user;
 
     if(!SessionUser) {
       ctx.status = 400;
