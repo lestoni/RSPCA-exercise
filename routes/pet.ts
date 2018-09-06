@@ -34,13 +34,11 @@ const router  = new Router();
  *  }
  *
  */
-//router.post('/', petController.create);
+router.post('/', petController.addPet);
 
-//router.post('/:RFID', petController.getByRFID);
+router.get('/', petController.getPets);
 
-//router.post('/:id', petController.getById);
-
-//router.post('/', petController.getAll);
+router.get('/:id', petController.getPet);
 
 // Expose Pet Router
 export default router;
