@@ -9,7 +9,10 @@ import logger from "koa-logger";
 import bodyParser from "koa-bodyparser";
 
 import { appErrorHandler } from "./lib/errors";
+import authenticate from  "./lib/authenticate";
 import router  from "./routes";
+import { config } from "./config";
+
 
 const app = new Koa();
 
@@ -32,6 +35,9 @@ if(app.env === 'development') {
 // Serve Documentation files
 app.use(serve(path.join(__dirname, './docs')));
 
+// Add Authentication Middleware
+app.use(authenticate())
+
 // Enable Body parser
 app.use(bodyParser());
 
@@ -39,4 +45,4 @@ app.use(bodyParser());
 app.use(router.routes());
 
 // Export app for testing
-export default app;
+export default app
