@@ -1,12 +1,12 @@
 /**
  * Load Module Dependencies.
  */
-import * as Router from "koa-router";
+import Router from "koa-router";
 
-import * as userController from "../controllers/user";
-import * as authController from "../controllers/auth";
+import userController from "../controllers/user";
+import authController from "../controllers/auth";
 
-var router  = Router();
+var router  = new Router();
 
 /**
  * @api {post} /users/login Login A user
@@ -20,7 +20,7 @@ var router  = Router();
  *
  *
  */
-router.post('/login', authController.login);
+router.post('/login', authController.loginUser);
 
 /**
  * @api {post} /users/create Create A user
@@ -34,7 +34,7 @@ router.post('/login', authController.login);
  *
  *
  */
-router.post('/create', userController.create);
+router.post('/create', userController.createUser);
 
 /**
  * @api {post} /users/logout Logout a user
@@ -46,7 +46,7 @@ router.post('/create', userController.create);
  *
  *
  */
-router.post('/logout', authController.logout);
+router.post('/logout', authController.logoutUser);
 
 /**
  * @api {get} /users/paginate?page=<RESULTS_PAGE>&per_page=<RESULTS_PER_PAGE> Get users collection
@@ -58,7 +58,7 @@ router.post('/logout', authController.logout);
  * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
  * and `per_page=<RESULTS_PER_PAGE>`.
  */
-router.get('/', userController.fetchAllByPagination);
+//router.get('/', userController.fetchAllByPagination);
 
 
 /**
@@ -71,7 +71,7 @@ router.get('/', userController.fetchAllByPagination);
  *
  *
  */
-router.put('/:id', userController.update);
+//router.put('/:id', userController.update);
 
 
 /**
@@ -84,7 +84,7 @@ router.put('/:id', userController.update);
  *
  *
  */
-router.delete('/:id', userController.remove);
+//router.delete('/:id', userController.remove);
 
 
 /**
@@ -97,7 +97,7 @@ router.delete('/:id', userController.remove);
  *
  *
  */
-router.get('/:id', userController.fetchOne);
+//router.get('/:id', userController.fetchOne);
 
 
 // Expose User Router

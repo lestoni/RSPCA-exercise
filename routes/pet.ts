@@ -1,19 +1,19 @@
 /**
  * Load Module Dependencies.
  */
-import * as Router from "koa-router";
+import Router from "koa-router";
 
-import * as petController from "../controllers/exchange";
+import petController from "../controllers/pet";
 
 const router  = new Router();
 
 /**
- * @api {post} /api/exchange Calcuate Exchange Rate
+ * @api {post} /api/pet Calcuate Exchange Rate
  * @apiVersion 1.0.0
  * @apiName Calculate
  * @apiGroup Exchange
  *
- * @apiDescription Calcuate the equivalent exchange rate between currencies
+ * @apiDescription Calcuate the equivalent pet rate between currencies
  *
  * @apiParam {String} from_currency Currency Converting From
  * @apiParam {String} to_currency Currency Converting To
@@ -34,13 +34,13 @@ const router  = new Router();
  *  }
  *
  */
-router.post('/', petController.create);
+//router.post('/', petController.create);
 
-router.post('/:RFID', petController.getByRFID);
+//router.post('/:RFID', petController.getByRFID);
 
-router.post('/:id', petController.getById);
+//router.post('/:id', petController.getById);
 
-router.post('/', petController.getAll);
+//router.post('/', petController.getAll);
 
-// Expose Exchanger Router
-module.exports = router;
+// Expose Pet Router
+export default router;
