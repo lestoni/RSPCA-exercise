@@ -1,7 +1,16 @@
 /**
  * Load Module Dependencies
  */
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, OneToOne, JoinColumn } from "typeorm";
+import {
+  Entity, 
+  Column, 
+  PrimaryGeneratedColumn, 
+  BeforeInsert, 
+  OneToOne, 
+  JoinColumn ,
+  CreateDateColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { IsEmail, Length } from "class-validator";
 
 import { User } from "../entity/User";
@@ -23,5 +32,11 @@ export class AuthToken {
     eager: true
   })
   @JoinColumn()
-  user_id!: User;
+  user!: User;
+
+  @CreateDateColumn({type: "date"})
+  created_at!: Date;
+
+  @UpdateDateColumn({type: "date"})
+  updated_at!: Date;
 }

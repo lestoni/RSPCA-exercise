@@ -36,10 +36,16 @@ export default class UserController {
       }
 
       // Finally Save User
-      user = await UserRepo.save(user);
+      await UserRepo.save(user);
+
+      let createdUser = await UserRepo
+            .createQueryBuilder("user")
+            .select("id username")
+            .where("user.email = :email", { email: body.email })
+            .getOne();
 
       ctx.status = 201;
-      ctx.body = user;
+      ctx.body = createdUser;
 
     } catch(ex) {
       ctx.throw(ex);

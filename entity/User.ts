@@ -6,7 +6,9 @@ import {
   Column, 
   PrimaryGeneratedColumn, 
   BeforeInsert, 
-  OneToMany 
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn 
 } from "typeorm";
 import { 
   IsEmail, 
@@ -44,8 +46,16 @@ export class User {
   email!: string;
 
   // Associate Staff User With A Pet
-  @OneToMany(type => Pet, pet => pet.added_by)
+  @OneToMany(type => Pet, pet => pet.added_by,{
+    onDelete: "CASCADE"
+  })
   pets!: Pet[];
+
+  @CreateDateColumn({type: "date"})
+  created_at!: Date;
+
+  @UpdateDateColumn({type: "date"})
+  updated_at!: Date;
 
   // Listeners
   @BeforeInsert()

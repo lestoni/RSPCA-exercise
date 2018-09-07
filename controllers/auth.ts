@@ -50,23 +50,25 @@ export default class AuthController {
         throw new Error("User With Those Credentials Does Not Exist")
       }
 
-      // Verijfy Password
+      // Verify Password
       let isPasswordOk = await bcrypt.compare(body.password, user.password);
       if(!isPasswordOk) {
         throw new Error("User With Those Credentials Does Not Exist")
       }
 
       // Upsert User Auth Token
-      let userToken = await AuthTokenRepo.findOne({ user_id: user.id });
+      let userToken = await AuthTokenRepo.findOne({ user: user.id });
       let apiKey = crypto.randomBytes(23).toString("base64");
       if(userToken) {
         await AuthTokenRepo.update(user.id, { token: apiKey });
       } else {
         await AuthTokenRepo.insert({
-          user_id: user.id,
+          user: user.id,
           token: apiKey
         });
       }
+
+      delete user.password;
 
       ctx.body = {
         token: apiKey,

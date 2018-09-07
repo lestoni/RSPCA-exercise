@@ -1,11 +1,21 @@
 /**
  * Load Module Dependencies
  */
-import { getManager, Repository, Not, Equal }   from "typeorm";
+import { getManager, Repository  }   from "typeorm";
 import { validate, ValidationError, Validator }           from "class-validator";
 import { Context }                             from "koa";
 
 import { Pet } from "../entity/Pet";
+import { User } from "../entity/User";
+
+
+interface IPagination {
+  docs?: Array<any>;
+  total_docs?: number;
+  total_pages?: number;
+  current_page: number;
+  per_page: number;
+}
 
 
 export default class PetController {
@@ -16,12 +26,12 @@ export default class PetController {
       let body: any = ctx.request.body;
       const SessionUser = ctx.state.user;
 
-      body.added_by = SessionUser;
-
-      console.log(body)
-
       // Get Pet Repo
       const PetRepo: Repository<Pet> = getManager().getRepository(Pet);
+      const UserRepo: Repository<User> = getManager().getRepository(User);
+
+       const addedBy = await UserRepo.findOne(SessionUser.id);
+       body.added_by = SessionUser;
 
       // Construct Pet to Be Saved
       let pet = PetRepo.create(body);
@@ -40,6 +50,7 @@ export default class PetController {
         throw new Error("Pet Exists Already")
       }
 
+
       // Finally Save Pet
       pet = await PetRepo.save(pet);
 
@@ -56,7 +67,7 @@ export default class PetController {
 
     try {
       let body: any = ctx.request.body;
-      const SessionUser = ctx.state._user;
+      const SessionUser = ctx.state.user;
       const params = ctx.params;
 
       let validator = new Validator();
@@ -84,11 +95,18 @@ export default class PetController {
 
   public static async getPets(ctx: Context) {
 
+
     try {
       const body: any       = ctx.request.body;
-      const SessionUser   = ctx.state._user;
-      const params        = ctx.params;
-      const qs = ctx.query;
+      const SessionUser     = ctx.state.user;
+      const params          = ctx.params;
+      const qs              = ctx.query;
+
+      let res: IPagination = {
+        current_page: qs.page || 1,
+        per_page: qs.limit || 100,
+
+      };
 
       let validator = new Validator();
 
@@ -101,9 +119,23 @@ export default class PetController {
         query = { added_by: qs.added_by };
       }
 
-      let pets =  await PetRepo.find(query);
 
-      ctx.body = pets;
+      let petsCount = await PetRepo.count(query);
+
+      let pageCount =  Math.ceil(petsCount / res.per_page);
+
+      let pets =  await PetRepo.find({
+        where: query,
+        skip: res.current_page,
+        take: res.per_page,
+        order: { created_at: "DESC"}
+      });
+
+      res.docs = pets;
+      res.total_docs = petsCount;
+      res.total_pages = pageCount;
+
+      ctx.body = res;
 
     } catch(ex) {
       ctx.throw(ex);

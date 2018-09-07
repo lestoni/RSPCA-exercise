@@ -21,7 +21,6 @@ export default function authenticateUser() {
 
     // Skip Open Endpoints
     let skipEndpoint = config.OPEN_ENDPOINTS.some((endpoint: string): boolean => {
-      console.log(endpoint, ctx.url)
       return endpoint === ctx.url;
     });
 
@@ -66,9 +65,9 @@ export default function authenticateUser() {
         if(!token) {
           throw new Error("Access Token provided is invalid")
         }
+        
 
-        console.log(token)
-        let stateUser = await UserRepo.findOne({ id: token.user_id.id })
+        let stateUser = await UserRepo.findOne(token.user.id);
 
         ctx.state.user = stateUser;
 
