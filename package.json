@@ -10,9 +10,8 @@
     "docs": "./node_modules/.bin/apidoc --verbose -i routes/ -o docs",
     "start-dev": "DEBUG=api* nodemon --watch './**/*' -e ts --exec ts-node server.ts",
     "build-ts": "tsc",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
     "serve": "node server.js",
-    "build": "npm run tslint && npm run build-ts",
+    "build": "npm run build-ts",
     "start": "npm run serve",
     "test": "jest"
   },
